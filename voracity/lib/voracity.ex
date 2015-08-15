@@ -1,34 +1,22 @@
-defmodule VORACITY do
-
-  def print_multiple_times(n) when n <= 1 do
-    IO.write random(8)
-  end
-
-  def print_multiple_times(n) do
-    IO.write random(8)
-    print_multiple_times(n - 1)
-  end
+defmodule Voracity do
 
   def random(n) when is_integer(n) and n > 0 do
     :random.seed(:os.timestamp())
     :random.uniform(n)
-  end
-
-  def append_random_to(value, a, n) when n <= 1 do
-    a ++ [random(value)]
-  end
-
-  def append_random_to(value, a, n) do
-    a = a ++ [random(value)]
-    append_random_to(value, a, n - 1)
+    #Enum.to_list(1..n) |> Enum.shuffle |> List.first
   end
 
   def start() do
-     IO.puts "Game started..."
-     numbers = append_random_to(8, [], 10)
-     IO.puts numbers
+    IO.puts "Game started...\n"
+    f = Enum.map(1..100, fn x -> random(8) end)  
+      |> Enum.shuffle
+      |> Enum.with_index
+      |> Enum.map &to_grid(elem(&1, 1), elem(&1, 0))
   end
+
+  def to_grid(n, x) when rem(n + 1, 10) == 0, do: to_string(x) <> "\n\n"
+  def to_grid(n, x),                      do: to_string(x) <> "   "  
 
 end
   
-IO.puts VORACITY.start()
+IO.puts Voracity.start()
