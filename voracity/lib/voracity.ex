@@ -7,16 +7,19 @@ defmodule Voracity do
   end
 
   def start() do
-    IO.puts "Game started...\n"
-    f = Enum.map(1..100, fn x -> random(8) end)  
+    IO.puts "#{IO.ANSI.clear}"
+    IO.puts "#{IO.ANSI.green}Game started...#{IO.ANSI.reset}\n"
+    Stream.map(1..100, fn x -> random(8) end)  
       |> Enum.shuffle
-      |> Enum.with_index
+      |> Stream.with_index
       |> Enum.map &to_grid(elem(&1, 1), elem(&1, 0))
   end
 
+  def main(args) do
+    IO.puts Voracity.start()
+  end
+
   def to_grid(n, x) when rem(n + 1, 10) == 0, do: to_string(x) <> "\n\n"
-  def to_grid(n, x),                      do: to_string(x) <> "   "  
+  def to_grid(n, x), do: to_string(x) <> "   "  
 
 end
-  
-IO.puts Voracity.start()

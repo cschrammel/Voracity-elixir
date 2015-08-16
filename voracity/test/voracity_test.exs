@@ -9,6 +9,7 @@ defmodule VoracityTest do
   test "generate grid of random numbers" do
     grid = Voracity.start()
 
+    IO.puts "#{IO.ANSI.clear}"
     IO.puts grid
 
     assert length(grid) == 100
