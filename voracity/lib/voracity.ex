@@ -20,24 +20,32 @@ defmodule Voracity do
   end
 
   def game_loop(input, board, position) when input == "d" do
-    position = position + elem(Enum.at(board, position + 1), 0)
+    if can_move_left?(board, position) do
+      position = position + elem(Enum.at(board, position + 1), 0)
+    end
     game_loop("", board, position)
   end
 
   def game_loop(input, board, position) when input == "a" do
-    position = position - elem(Enum.at(board, position - 1), 0)
+    if can_move_right?(board, position) do
+      position = position - elem(Enum.at(board, position - 1), 0)
+    end
     game_loop("", board, position)
   end
 
   def game_loop(input, board, position) when input == "w" do
-    above = elem(Enum.at(board, position - 10), 0)
-    position = position - (above * 10)
+    if can_move_up?(board, position) do
+      above = elem(Enum.at(board, position - 10), 0)
+      position = position - (above * 10)
+    end
     game_loop("", board, position)
   end
 
   def game_loop(input, board, position) when input == "s" do
-    below = elem(Enum.at(board, position + 10), 0)
-    position = position + (below * 10)
+    if can_move_down?(board, position) do
+      below = elem(Enum.at(board, position + 10), 0)
+      position = position + (below * 10)
+    end
     game_loop("", board, position)
   end
 
@@ -61,6 +69,25 @@ defmodule Voracity do
     else
       "#{entry}   "  
     end
+  end
+
+
+  def can_move_left?(board, position) do
+    rem(position, 10) + elem(Enum.at(board, position + 1), 0) < 10
+  end
+
+  def can_move_right?(board, position) do
+    rem(position, 10) - elem(Enum.at(board, position - 1), 0) >= 0
+  end
+ 
+  def can_move_up?(board, position) do
+    above = elem(Enum.at(board, position - 10), 0)
+    position - (above * 10) >= 0
+  end
+
+  def can_move_down?(board, position) do
+    below = elem(Enum.at(board, position + 10), 0)
+    position + (below * 10) < 100
   end
 
 end
