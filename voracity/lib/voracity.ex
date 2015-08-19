@@ -6,12 +6,12 @@ defmodule Voracity do
 
   def init_board() do
     :random.seed(:os.timestamp())
-    Stream.map(1..grid_width*grid_width, fn x -> random(8) end)  
+    Stream.map(1..grid_width * grid_width, fn x -> random(8) end)  
       |> Enum.with_index
   end
 
   def main(args) do
-    position = random(grid_width*grid_width)
+    position = random(grid_width * grid_width)
     game_loop("", init_board(), position)
   end
 
@@ -45,13 +45,15 @@ defmodule Voracity do
     if can_move_down?(board, position) do
       below = elem(Enum.at(board, position + grid_width), 0)
       position = position + (below * grid_width)
+      path = Enum.map(1..below, fn x -> position + (x * grid_width) end)
     end
     game_loop("", board, position)
   end
-
+ 
   def game_loop(input, board, position) do
     IO.puts "#{IO.ANSI.clear}"
-    IO.puts board |> Enum.map &to_view(&1, position)
+    IO.puts board 
+      |> Enum.map &to_view(&1, position)
     input = IO.getn("Enter direction (q to quit):", 1)
     game_loop(input, board, position)
   end
@@ -59,8 +61,8 @@ defmodule Voracity do
   def to_view(t, position) do
     value = to_string(elem(t, 0))
     index = elem(t, 1)
-    if index == position do 
-      entry = "#{IO.ANSI.yellow}#{value}#{IO.ANSI.reset}"
+    if index == position do
+      entry = "#{IO.ANSI.green}#{value}#{IO.ANSI.reset}"
     else
       entry = value
     end
