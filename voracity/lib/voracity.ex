@@ -19,44 +19,41 @@ defmodule Voracity do
   end
 
   def game_loop(input, board, position, taken) when input == "q" do
-    IO.puts "Have a nice day!"
+    IO.puts "Game over.  Have a nice day!"
   end
 
   def game_loop(input, board, position, taken) when input == "d" do
-    right = right_value(board, position)
-    path = Enum.map(0..right - 1, fn x -> position + x end)
-    if can_move_right?(board, position, path, taken) do
-      position = position + right
+    if can_move_right?(board, position, taken) do
+      path = path_right(board, position)
+      position = position + right_value(board, position)
       taken = taken ++ path
     end
     game_loop("", board, position, taken)
   end
 
   def game_loop(input, board, position, taken) when input == "a" do
-    left = left_value(board, position)
-    path = Enum.map(0..left - 1, fn x -> position - x end)
-    if can_move_left?(board, position, path, taken) do
-      position = position - left
+    if can_move_left?(board, position, taken) do
+      path = path_left(board, position)
+      position = position - left_value(board, position)
       taken = taken ++ path
     end
     game_loop("", board, position, taken)
   end
 
   def game_loop(input, board, position, taken) when input == "w" do
-    above = up_value(board, position)
-    path = Enum.map(0..above - 1, fn x -> position - (x * grid_width) end)
-    if can_move_up?(board, position, path, taken) do
-      position = position - (above * grid_width)
+    if can_move_up?(board, position, taken) do
+      up = up_value(board, position)
+      path = path_up(board, position)
+      position = position - (up * grid_width)
       taken = taken ++ path
     end
     game_loop("", board, position, taken)
   end
 
   def game_loop(input, board, position, taken) when input == "s" do
-    below = down_value(board, position)
-    path = Enum.map(0..below - 1, fn x -> position + (x * grid_width) end)
-    if can_move_down?(board, position, path, taken) do
-      position = position + (below * grid_width)
+    if can_move_down?(board, position, taken) do
+      path = path_down(board, position)
+      position = position + (down_value(board, position) * grid_width)
       taken = taken ++ path
     end
     game_loop("", board, position, taken)
@@ -66,8 +63,19 @@ defmodule Voracity do
     IO.puts "#{IO.ANSI.clear}"
     IO.puts board |> Enum.map &to_view(&1, position, taken)
     IO.puts "Score = " <> to_string(Enum.count(taken))
-    input = IO.getn("Enter direction (q to quit): ", 1)
-    game_loop(input, board, position, taken)
+    if (any_moves_left?(board, position, taken)) do
+      input = IO.getn("Enter direction (q to quit): ", 1)
+      game_loop(input, board, position, taken)
+    else
+      game_loop("q", board, position, taken)
+    end
+  end
+
+  def any_moves_left?(board, position, taken) do
+    can_move_down?(board, position, taken)
+      or can_move_up?(board, position, taken)
+      or can_move_left?(board, position, taken)
+      or can_move_right?(board, position, taken)
   end
 
   def to_view(t, position, taken) do
@@ -88,24 +96,46 @@ defmodule Voracity do
     end
   end
 
-  def can_move_right?(board, position, path, taken) do
-    rem(position, grid_width) + right_value(board, position) < grid_width 
-      and !is_blocked?(path, taken)
+  def path_left(board, position) do
+    Enum.map(0..left_value(board, position) - 1, 
+      fn x -> position - x end)
   end
 
-  def can_move_left?(board, position, path, taken) do
+  def path_right(board, position) do
+    Enum.map(0..right_value(board, position) - 1, 
+      fn x -> position + x end)
+  end
+
+  def path_down(board, position) do
+    Enum.map(0..down_value(board, position) - 1, 
+      fn x -> position + (x * grid_width) end)
+  end
+
+  def path_up(board, position) do
+    Enum.map(0..up_value(board, position) - 1, 
+      fn x -> position - (x * grid_width) end)
+  end
+
+  def can_move_right?(board, position, taken) do
+    position < grid_length
+      and rem(position, grid_width) + right_value(board, position) < grid_width 
+      and !is_blocked?(path_right(board, position), taken)
+  end
+
+  def can_move_left?(board, position, taken) do
     rem(position, grid_width) - left_value(board, position) >= 0
-      and !is_blocked?(path, taken)
+      and !is_blocked?(path_left(board, position), taken)
   end
  
-  def can_move_up?(board, position, path, taken) do
+  def can_move_up?(board, position, taken) do
     position - (up_value(board, position) * grid_width) >= 0
-      and !is_blocked?(path, taken)
+      and !is_blocked?(path_up(board, position), taken)
   end
 
-  def can_move_down?(board, position, path, taken) do
-    position + (down_value(board,position) * grid_width) < Enum.count(board)
-      and !is_blocked?(path, taken)
+  def can_move_down?(board, position, taken) do
+    position + grid_width < grid_length
+      and position + (down_value(board,position) * grid_width) < Enum.count(board)
+      and !is_blocked?(path_down(board, position), taken)
   end
 
   def left_value(board, position) do
