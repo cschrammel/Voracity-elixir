@@ -12,55 +12,87 @@ defmodule Voracity do
 
   def main(args) do
     position = random(grid_width * grid_width)
-    game_loop("", init_board(), position)
+    game_loop("", init_board(), position, [])
   end
 
-  def game_loop(input, board, position) when input == "q" do
+  def game_loop(input, board, position, taken) when input == "q" do
     IO.puts "Have a nice day!"
   end
 
-  def game_loop(input, board, position) when input == "d" do
-    if can_move_left?(board, position) do
-      position = position + elem(Enum.at(board, position + 1), 0)
-    end
-    game_loop("", board, position)
-  end
-
-  def game_loop(input, board, position) when input == "a" do
-    if can_move_right?(board, position) do
-      position = position - elem(Enum.at(board, position - 1), 0)
-    end
-    game_loop("", board, position)
-  end
-
-  def game_loop(input, board, position) when input == "w" do
-    if can_move_up?(board, position) do
-      above = elem(Enum.at(board, position - grid_width), 0)
-      position = position - (above * grid_width)
-    end
-    game_loop("", board, position)
-  end
-
-  def game_loop(input, board, position) when input == "s" do
-    if can_move_down?(board, position) do
-      below = elem(Enum.at(board, position + grid_width), 0)
-      position = position + (below * grid_width)
-      path = Enum.map(1..below, fn x -> position + (x * grid_width) end)
-    end
-    game_loop("", board, position)
-  end
- 
-  def game_loop(input, board, position) do
+  def game_loop(input, board, position, taken) do
     IO.puts "#{IO.ANSI.clear}"
     IO.puts board 
-      |> Enum.map &to_view(&1, position)
+      |> Enum.map &to_view(&1, position, taken)
+
+    IO.puts "Score = " <> to_string(Enum.count(taken))
     input = IO.getn("Enter direction (q to quit):", 1)
-    game_loop(input, board, position)
+    game_loop(input, board, position, taken)
   end
 
-  def to_view(t, position) do
+  def game_loop(input, board, position, taken) when input == "d" do
+    if can_move_right?(board, position) do
+      right = elem(Enum.at(board, position + 1), 0)
+      new_position = position + right
+      path = Enum.map(0..right - 1, fn x -> position + x end)
+      if !is_blocked(path, taken) do
+        position = new_position
+        taken = taken ++ path
+      end
+    end
+    game_loop("", board, position, taken)
+  end
+
+  def game_loop(input, board, position, taken) when input == "a" do
+    if can_move_left?(board, position) do
+      left = elem(Enum.at(board, position - 1), 0)
+      new_position = position - left
+      path = Enum.map(0..left - 1, fn x -> position - x end)
+      if !is_blocked(path, taken) do
+        position = new_position
+        taken = taken ++ path
+      end
+    end
+    game_loop("", board, position, taken)
+  end
+
+  def game_loop(input, board, position, taken) when input == "w" do
+    if can_move_up?(board, position) do
+      above = elem(Enum.at(board, position - grid_width), 0)
+      new_position = position - (above * grid_width)
+      path = Enum.map(0..above - 1, fn x -> position - (x * grid_width) end)
+      if !is_blocked(path, taken) do
+        position = new_position
+        taken = taken ++ path
+      end
+    end
+    game_loop("", board, position, taken)
+  end
+
+  def game_loop(input, board, position, taken) when input == "s" do
+    if can_move_down?(board, position) do
+      below = elem(Enum.at(board, position + grid_width), 0)
+      new_position = position + (below * grid_width)
+      path = Enum.map(0..below - 1, fn x -> position + (x * grid_width) end)
+      if !is_blocked(path, taken) do
+        position = new_position
+        taken = taken ++ path
+      end
+    end
+    game_loop("", board, position, taken)
+  end
+
+  def is_blocked(path, taken) do
+      s1 = HashSet.new
+      s2 = HashSet.new
+      !Set.disjoint?(Enum.into(path, s1), Enum.into(taken, s2))
+  end
+
+  def to_view(t, position, taken) do
     value = to_string(elem(t, 0))
     index = elem(t, 1)
+    if Enum.find_index(taken, fn x -> x == index end) != nil do
+      value = "_"
+    end
     if index == position do
       entry = "#{IO.ANSI.green}#{value}#{IO.ANSI.reset}"
     else
@@ -73,11 +105,11 @@ defmodule Voracity do
     end
   end
 
-  def can_move_left?(board, position) do
+  def can_move_right?(board, position) do
     rem(position, grid_width) + elem(Enum.at(board, position + 1), 0) < grid_width
   end
 
-  def can_move_right?(board, position) do
+  def can_move_left?(board, position) do
     rem(position, grid_width) - elem(Enum.at(board, position - 1), 0) >= 0
   end
  
