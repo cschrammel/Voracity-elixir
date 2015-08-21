@@ -1,7 +1,7 @@
 defmodule Voracity do
 
   def grid_width do
-    12
+    10
   end
 
   def grid_length do
@@ -117,7 +117,7 @@ defmodule Voracity do
   end
 
   def can_move_right?(board, position, taken) do
-    position < grid_length
+    position < length(board) - 1
       and rem(position, grid_width) + right_value(board, position) < grid_width 
       and !is_blocked?(path_right(board, position), taken)
   end
