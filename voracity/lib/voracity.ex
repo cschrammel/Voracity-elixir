@@ -42,9 +42,8 @@ defmodule Voracity do
 
   def game_loop(input, board, position, taken) when input == "w" do
     if can_move_up?(board, position, taken) do
-      up = up_value(board, position)
       path = path_up(board, position)
-      position = position - (up * grid_width)
+      position = position - (up_value(board, position) * grid_width)
       taken = taken ++ path
     end
     game_loop("", board, position, taken)
