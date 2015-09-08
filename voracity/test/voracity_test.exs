@@ -13,7 +13,7 @@ defmodule VoracityTest do
     position = 1
     taken = []
 
-    assert Voracity.can_move_right?(board, position, taken, 2) == false
+    assert Voracity.can_move_right?(board, position, taken) == false
   end
 
   test "can move right ending on edge" do
@@ -22,7 +22,7 @@ defmodule VoracityTest do
     position = 0
     taken = []
 
-    assert Voracity.can_move_right?(board, position, taken, 2) == true
+    assert Voracity.can_move_right?(board, position, taken) == true
   end
 
   test "can't move right because blocked" do
@@ -31,7 +31,7 @@ defmodule VoracityTest do
     position = 0
     taken = [1]
 
-    assert Voracity.can_move_right?(board, position, taken, 2) == false
+    assert Voracity.can_move_right?(board, position, taken) == false
   end
 
   test "path right returns list of next moves" do
@@ -48,7 +48,7 @@ defmodule VoracityTest do
     position = 0
     taken = []
 
-    assert Voracity.can_move_left?(board, position, taken, 2) == false
+    assert Voracity.can_move_left?(board, position, taken) == false
   end
 
   test "can move left ending on edge" do
@@ -57,7 +57,7 @@ defmodule VoracityTest do
     position = 1
     taken = []
 
-    assert Voracity.can_move_left?(board, position, taken, 2) == true
+    assert Voracity.can_move_left?(board, position, taken) == true
   end
 
   test "path left returns list of next moves" do
@@ -74,7 +74,7 @@ defmodule VoracityTest do
     position = 1
     taken = [0]
 
-    assert Voracity.can_move_left?(board, position, taken, 2) == false
+    assert Voracity.can_move_left?(board, position, taken) == false
   end
 
   test "can't move up because on edge" do
@@ -83,7 +83,7 @@ defmodule VoracityTest do
     position = 0
     taken = []
 
-    assert Voracity.can_move_up?(board, position, taken, 2) == false
+    assert Voracity.can_move_up?(board, position, taken) == false
   end
 
   test "can move up ending on edge" do
@@ -92,7 +92,7 @@ defmodule VoracityTest do
     position = 2
     taken = []
 
-    assert Voracity.can_move_up?(board, position, taken, 2) == true
+    assert Voracity.can_move_up?(board, position, taken) == true
   end
 
   test "can't move up because blocked" do
@@ -101,7 +101,7 @@ defmodule VoracityTest do
     position = 2
     taken = [0]
 
-    assert Voracity.can_move_up?(board, position, taken, 2) == false
+    assert Voracity.can_move_up?(board, position, taken) == false
   end
 
   test "path up returns list of next moves" do
@@ -118,7 +118,7 @@ defmodule VoracityTest do
     position = 2
     taken = []
 
-    assert Voracity.can_move_down?(board, position, taken, 2) == false
+    assert Voracity.can_move_down?(board, position, taken) == false
   end
 
   test "can move down ending on edge" do
@@ -127,7 +127,7 @@ defmodule VoracityTest do
     position = 1
     taken = []
 
-    assert Voracity.can_move_down?(board, position, taken, 2) == true
+    assert Voracity.can_move_down?(board, position, taken) == true
   end
 
   test "can't move down because blocked" do
@@ -136,7 +136,7 @@ defmodule VoracityTest do
     position = 1
     taken = [3]
 
-    assert Voracity.can_move_down?(board, position, taken, 2) == false
+    assert Voracity.can_move_down?(board, position, taken) == false
   end
 
  test "path down returns list of next moves" do
